@@ -51,11 +51,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     // Posts CRUD - create route must come before {post} route
-    Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::post('posts', [PostController::class, 'store'])->name('posts.store');
-    Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
-    Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
-    Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::prefix('posts')->name('posts.')->group(function () {
+        Route::get('/create', [PostController::class, 'create'])->name('create');
+        Route::post('/', [PostController::class, 'store'])->name('store');
+        Route::get('/{post}/edit', [PostController::class, 'edit'])->name('edit');
+        Route::put('/{post}', [PostController::class, 'update'])->name('update');
+        Route::delete('/{post}', [PostController::class, 'destroy'])->name('destroy');
+    });
 
     // Comments Routes
     Route::post('posts/{post}/comments', [CommentController::class, 'store'])
@@ -77,12 +79,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
     // Admin Posts Management (with route model binding)
-    Route::get('posts', [AdminPostController::class, 'index'])->name('posts.index');
-    Route::get('posts/{post}', [AdminPostController::class, 'show'])->name('posts.show');
-    Route::get('posts/{post}/edit', [AdminPostController::class, 'edit'])->name('posts.edit');
-    Route::put('posts/{post}', [AdminPostController::class, 'update'])->name('posts.update');
-    Route::delete('posts/{post}', [AdminPostController::class, 'destroy'])->name('posts.destroy');
-    Route::post('posts/{id}/restore', [AdminPostController::class, 'restore'])->name('posts.restore');
+    Route::prefix('posts')->name('posts.')->group(function () {
+        Route::get('/', [AdminPostController::class, 'index'])->name('index');
+        Route::get('/{post}', [AdminPostController::class, 'show'])->name('show');
+        Route::get('/{post}/edit', [AdminPostController::class, 'edit'])->name('edit');
+        Route::put('/{post}', [AdminPostController::class, 'update'])->name('update');
+        Route::delete('/{post}', [AdminPostController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/restore', [AdminPostController::class, 'restore'])->name('restore');
+    });
 
     // Admin Users Management (with route model binding)
     Route::resource('users', AdminUserController::class);
